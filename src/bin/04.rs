@@ -26,15 +26,11 @@ impl Range {
 pub fn part_one(input: &str) -> Option<u32> {
     let input_ranges: Vec<Vec<Range>> = input.split("\n").map(|line| line.split(",").map(Range::read).collect::<Vec<Range>>()).collect();
 
-    println!("{input_ranges:?}");
-
     Some(input_ranges.iter().filter(|r| r[0].contains(&r[1]) || r[1].contains(&r[0])).count() as u32)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
     let input_ranges: Vec<Vec<Range>> = input.split("\n").map(|line| line.split(",").map(Range::read).collect::<Vec<Range>>()).collect();
-
-    println!("{input_ranges:?}");
 
     Some(input_ranges.iter().filter(|r| r[0].overlaps(&r[1]) || r[1].overlaps(&r[0])).count() as u32)
 }

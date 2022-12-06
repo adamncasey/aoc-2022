@@ -1,7 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
 fn most_shared(bag1: &str, bag2: &str, bag3: &str) -> char {
-    println!("{bag1:?}, {bag2:?}, {bag3:?}");
     let mut items: HashMap<char, u32> = HashMap::new();
 
     for bag in [bag1, bag2, bag3] {
