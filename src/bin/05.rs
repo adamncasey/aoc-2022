@@ -23,7 +23,7 @@ fn make_output(stacks: &Vec<Vec<char>>) -> String {
     for stack in stacks {
         match stack.last() {
             Some(ch) => output.push(*ch),
-            None => {},
+            None => {}
         }
     }
 
@@ -35,7 +35,12 @@ pub fn part_one(input: &str) -> Option<String> {
     let mut stacks = read_stacks(input.0);
 
     for line in input.1.split("\n") {
-        let nums = line.split(" ").skip(1).step_by(2).map(|n| n.parse::<usize>().unwrap()).collect::<Vec<usize>>();
+        let nums = line
+            .split(" ")
+            .skip(1)
+            .step_by(2)
+            .map(|n| n.parse::<usize>().unwrap())
+            .collect::<Vec<usize>>();
 
         for _ in 0..nums[0] {
             let moving = stacks[nums[1] - 1].pop().unwrap();
@@ -53,7 +58,12 @@ pub fn part_two(input: &str) -> Option<String> {
     let mut stacks = read_stacks(input.0);
 
     for line in input.1.split("\n") {
-        let nums = line.split(" ").skip(1).step_by(2).map(|n| n.parse::<usize>().unwrap()).collect::<Vec<usize>>();
+        let nums = line
+            .split(" ")
+            .skip(1)
+            .step_by(2)
+            .map(|n| n.parse::<usize>().unwrap())
+            .collect::<Vec<usize>>();
 
         let target_len = stacks[nums[1] - 1].len() - nums[0];
         let moving = stacks[nums[1] - 1].split_off(target_len);

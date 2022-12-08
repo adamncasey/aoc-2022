@@ -17,7 +17,7 @@ impl Move {
             "A" | "X" => Move::Rock,
             "B" | "Y" => Move::Paper,
             "C" | "Z" => Move::Scissors,
-            _ => panic!("Bad input {input}")
+            _ => panic!("Bad input {input}"),
         }
     }
 
@@ -31,27 +31,21 @@ impl Move {
 
     fn match_score(&self, other: &Move) -> u32 {
         match self {
-            Move::Rock => {
-                match other {
-                    Move::Rock => 3,
-                    Move::Paper => 0,
-                    Move::Scissors => 6,
-                }
+            Move::Rock => match other {
+                Move::Rock => 3,
+                Move::Paper => 0,
+                Move::Scissors => 6,
             },
-            Move::Paper => {
-                match other {
-                    Move::Rock => 6,
-                    Move::Paper => 3,
-                    Move::Scissors => 0,
-                }
+            Move::Paper => match other {
+                Move::Rock => 6,
+                Move::Paper => 3,
+                Move::Scissors => 0,
             },
-            Move::Scissors => {
-                match other {
-                    Move::Rock => 0,
-                    Move::Paper => 6,
-                    Move::Scissors => 3,
-                }
-            }
+            Move::Scissors => match other {
+                Move::Rock => 0,
+                Move::Paper => 6,
+                Move::Scissors => 3,
+            },
         }
     }
 }
@@ -62,7 +56,7 @@ impl Result {
             "X" => Result::Lose,
             "Y" => Result::Draw,
             "Z" => Result::Win,
-            _ => panic!("Bad input {input}")
+            _ => panic!("Bad input {input}"),
         }
     }
 }
@@ -75,7 +69,6 @@ pub fn part_one(input: &str) -> Option<u32> {
         plays.push((moves.next().unwrap(), moves.next().unwrap()));
     }
 
-
     let mut score: u32 = 0;
     for play in plays {
         let round_score = play.1.value() + play.1.match_score(&play.0);
@@ -87,27 +80,21 @@ pub fn part_one(input: &str) -> Option<u32> {
 
 fn correct_play(play: Move, result: Result) -> Move {
     match play {
-        Move::Rock => {
-            match result {
-                Result::Win => Move::Paper,
-                Result::Draw => Move::Rock,
-                Result::Lose => Move::Scissors,
-            }
+        Move::Rock => match result {
+            Result::Win => Move::Paper,
+            Result::Draw => Move::Rock,
+            Result::Lose => Move::Scissors,
         },
-        Move::Paper => {
-            match result {
-                Result::Draw => Move::Paper,
-                Result::Lose => Move::Rock,
-                Result::Win => Move::Scissors,
-            }
+        Move::Paper => match result {
+            Result::Draw => Move::Paper,
+            Result::Lose => Move::Rock,
+            Result::Win => Move::Scissors,
         },
-        Move::Scissors => {
-            match result {
-                Result::Lose => Move::Paper,
-                Result::Win => Move::Rock,
-                Result::Draw => Move::Scissors,
-            }
-        }
+        Move::Scissors => match result {
+            Result::Lose => Move::Paper,
+            Result::Win => Move::Rock,
+            Result::Draw => Move::Scissors,
+        },
     }
 }
 
@@ -116,7 +103,10 @@ pub fn part_two(input: &str) -> Option<u32> {
     for game in input.split("\n") {
         let mut moves = game.split(" ");
 
-        plays.push((Move::read(moves.next().unwrap()), Result::read(moves.next().unwrap())));
+        plays.push((
+            Move::read(moves.next().unwrap()),
+            Result::read(moves.next().unwrap()),
+        ));
     }
 
     let mut score = 0;

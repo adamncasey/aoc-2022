@@ -6,7 +6,10 @@ struct Range {
 
 impl Range {
     fn read(input: &str) -> Range {
-        let nums: Vec<u32> = input.split("-").map(|idx| idx.parse::<u32>().unwrap()).collect();
+        let nums: Vec<u32> = input
+            .split("-")
+            .map(|idx| idx.parse::<u32>().unwrap())
+            .collect();
 
         Range {
             start: nums[0],
@@ -17,22 +20,38 @@ impl Range {
     fn contains(&self, other: &Range) -> bool {
         self.start <= other.start && self.end >= other.end
     }
-    
+
     fn overlaps(&self, other: &Range) -> bool {
         self.start <= other.end && self.end >= other.start
     }
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let input_ranges: Vec<Vec<Range>> = input.split("\n").map(|line| line.split(",").map(Range::read).collect::<Vec<Range>>()).collect();
+    let input_ranges: Vec<Vec<Range>> = input
+        .split("\n")
+        .map(|line| line.split(",").map(Range::read).collect::<Vec<Range>>())
+        .collect();
 
-    Some(input_ranges.iter().filter(|r| r[0].contains(&r[1]) || r[1].contains(&r[0])).count() as u32)
+    Some(
+        input_ranges
+            .iter()
+            .filter(|r| r[0].contains(&r[1]) || r[1].contains(&r[0]))
+            .count() as u32,
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let input_ranges: Vec<Vec<Range>> = input.split("\n").map(|line| line.split(",").map(Range::read).collect::<Vec<Range>>()).collect();
+    let input_ranges: Vec<Vec<Range>> = input
+        .split("\n")
+        .map(|line| line.split(",").map(Range::read).collect::<Vec<Range>>())
+        .collect();
 
-    Some(input_ranges.iter().filter(|r| r[0].overlaps(&r[1]) || r[1].overlaps(&r[0])).count() as u32)
+    Some(
+        input_ranges
+            .iter()
+            .filter(|r| r[0].overlaps(&r[1]) || r[1].overlaps(&r[0]))
+            .count() as u32,
+    )
 }
 
 fn main() {

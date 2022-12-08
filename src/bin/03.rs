@@ -45,11 +45,25 @@ fn score_item(ch: char) -> u32 {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    Some(input.split("\n").map(common_item).map(score_item).sum::<u32>())
+    Some(
+        input
+            .split("\n")
+            .map(common_item)
+            .map(score_item)
+            .sum::<u32>(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    Some(input.split("\n").collect::<Vec<&str>>().chunks_exact(3).map(|bags| most_shared(bags[0], bags[1], bags[2])).map(score_item).sum::<u32>())
+    Some(
+        input
+            .split("\n")
+            .collect::<Vec<&str>>()
+            .chunks_exact(3)
+            .map(|bags| most_shared(bags[0], bags[1], bags[2]))
+            .map(score_item)
+            .sum::<u32>(),
+    )
 }
 
 fn main() {

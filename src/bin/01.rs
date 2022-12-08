@@ -1,15 +1,27 @@
 pub fn part_two(input: &str) -> Option<u32> {
-    let mut sorted = input.split("\n\n").map(|e| e.split("\n").map(|num| num.parse::<u32>().unwrap()).sum::<u32>()).collect::<Vec<u32>>();
+    let mut sorted = input
+        .split("\n\n")
+        .map(|e| {
+            e.split("\n")
+                .map(|num| num.parse::<u32>().unwrap())
+                .sum::<u32>()
+        })
+        .collect::<Vec<u32>>();
     sorted.sort();
     let max = sorted.iter().rev().take(3).sum::<u32>();
 
-    Some(max) 
+    Some(max)
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    input.split("\n\n").map(|e| e.split("\n").map(|num| {
-        num.parse::<u32>().unwrap()
-    }).sum::<u32>()).max()
+    input
+        .split("\n\n")
+        .map(|e| {
+            e.split("\n")
+                .map(|num| num.parse::<u32>().unwrap())
+                .sum::<u32>()
+        })
+        .max()
 }
 
 fn main() {
