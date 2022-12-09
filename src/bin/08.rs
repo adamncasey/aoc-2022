@@ -34,33 +34,81 @@ fn is_visible(trees: &Vec<Vec<u8>>, x: usize, y: usize) -> bool {
         return true;
     }
 
-    if trees[(x+1)..].iter().map(|r| r[y]).max().unwrap() < height {
+    if trees[(x + 1)..].iter().map(|r| r[y]).max().unwrap() < height {
         return true;
     }
 
     return false;
 }
 
-fn scenic_score(trees: &Vec<Vec<u8>>, x: usize, y: usize) -> bool {
+fn scenic_score(trees: &Vec<Vec<u8>>, x: usize, y: usize) -> u32 {
     let height = trees[x][y];
+    let mut total_score = 1;
 
-    if trees[x][0..y].iter().max().unwrap() < &height {
-        return true;
+    let mut last_height = 0;
+    let mut l_score = 0;
+    for col in (0..y).rev() {
+        let t = trees[x][col];
+        // So it turns out you CAN see occluded trees?!
+        //if t >= last_height {
+        l_score += 1;
+        last_height = t;
+        //}
+
+        if t >= height {
+            break;
+        }
     }
+    total_score *= l_score;
 
-    if trees[x][(y + 1)..].iter().max().unwrap() < &height {
-        return true;
+    let mut last_height = 0;
+    let mut r_score = 0;
+    for col in (y + 1)..(trees[x].len()) {
+        let t = trees[x][col];
+        //if t >= last_height {
+        r_score += 1;
+        last_height = t;
+        //}
+
+        if t >= height {
+            break;
+        }
     }
+    total_score *= r_score;
 
-    if trees[0..x].iter().map(|r| r[y]).max().unwrap() < height {
-        return true;
+    let mut last_height = 0;
+    let mut u_score = 0;
+    for row in (0..x).rev() {
+        let t = trees[row][y];
+        //if t >= last_height {
+        u_score += 1;
+        last_height = t;
+        //}
+
+        if t >= height {
+            break;
+        }
     }
+    total_score *= u_score;
 
-    if trees[(x+1)..].iter().map(|r| r[y]).max().unwrap() < height {
-        return true;
+    let mut last_height = 0;
+    let mut d_score = 0;
+    for row in (x + 1)..(trees.len()) {
+        let t = trees[row][y];
+        //if t >= last_height {
+        d_score += 1;
+        last_height = t;
+        //}
+
+        if t >= height {
+            break;
+        }
     }
+    total_score *= d_score;
 
-    return false;
+    println!("Scenic {x},{y} {total_score}: {u_score} {l_score} {d_score} {r_score}");
+
+    total_score
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
@@ -79,7 +127,19 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let trees = read_file(input);
+
+    trees
+        .iter()
+        .enumerate()
+        .map(|(x, row)| {
+            row.iter()
+                .enumerate()
+                .map(|(y, t)| scenic_score(&trees, x, y))
+                .max()
+                .unwrap()
+        })
+        .max()
 }
 
 fn main() {
@@ -95,12 +155,12 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = advent_of_code::read_file("examples", 8);
-        assert_eq!(part_one(&input), None);
+        assert_eq!(part_one(&input), Some(21));
     }
 
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 8);
-        assert_eq!(part_two(&input), None);
+        assert_eq!(part_two(&input), Some(8));
     }
 }
