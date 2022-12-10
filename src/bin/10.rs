@@ -37,7 +37,7 @@ fn calc(input: &str) -> (i32, String) {
 
     let mut register: i32 = 1;
     let mut next_work: Option<(usize, Instr)> = None;
-    for cycle in 1..=236 {
+    for cycle in 1..=240 {
         if let None = next_work {
             let instr = instrs.pop().unwrap();
             next_work = Some((cycle + instr.cycles(), instr));
@@ -116,7 +116,7 @@ addx -5"#; //
 ####    ####    ####    ####    ####    
 #####     #####     #####     #####     
 ######      ######      ######      ####
-#######       #######       ####### "#
+#######       #######       #######     "#
             ))
         );
     }
