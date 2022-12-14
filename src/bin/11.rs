@@ -86,7 +86,6 @@ fn monkey_business(monkeys: &mut [Monkey], rounds: usize, reducer: u64) -> u64 {
     println!("Common multiple {common_multiple}");
 
     for round in 0..rounds {
-        println!("{round}");
         for m in 0..monkeys.len() {
             let mut thrown: Vec<(usize, u64)> = Vec::new();
             let monkey: &Monkey = &monkeys[m];
