@@ -54,8 +54,8 @@ pub fn part_one_solve(input: &str) -> Option<u32> {
 
 fn sensor_sees(x: i32, y: i32, sensors: &Vec<PosDist>) -> (bool, i32) {
     for sensor in sensors.iter() {
-        let dist = (x - sensor.0.0).abs() + (y - sensor.0.1).abs();
-    
+        let dist = (x - sensor.0 .0).abs() + (y - sensor.0 .1).abs();
+
         if dist <= sensor.1 {
             return (true, sensor.1 - dist + 1);
         }
@@ -83,7 +83,6 @@ pub fn part_two(input: &str, max_coord: i32) -> Option<i64> {
                 println!("Found {x}, {y}");
                 return Some((x as i64 * 4000000) + y as i64);
             }
-
 
             y += remaining_dist;
         }
