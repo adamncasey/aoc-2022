@@ -1,5 +1,4 @@
-use std::backtrace::Backtrace;
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 struct Node {
@@ -39,17 +38,10 @@ fn parse(input: &str) -> HashMap<String, Node> {
     output
 }
 
-#[derive(Debug)]
-struct State {
-    current: String,
-    open: HashSet<String>,
-    score: u32,
-    flow_rate: u32,
-}
-
 fn cave_dfs(
     caves: &HashMap<String, Node>,
-    current: &str,
+    h_current: &str,
+    e_current: &str,
     open: HashSet<String>,
     score: u32,
     flow_rate: u32,
@@ -57,61 +49,46 @@ fn cave_dfs(
     best_so_far: &mut u32,
     max_score_estimates: &HashMap<u32, u32>,
     path: &mut Vec<String>,
+    h_free_at: u32,
+    e_free_at: u32,
 ) {
     if time_remaining == 0 {
         if score > *best_so_far {
             *best_so_far = score;
-            println!("{current} {score} {flow_rate} {open:?} {path:?}");
+            println!("{h_current} {e_current} {score} {flow_rate} {open:?} {path:?}");
         }
         return;
     }
 
-    let score = score + flow_rate;
+    let score = if time_remaining % 2 == 0 {
+        score + flow_rate
+    } else {
+        score
+    };
 
-    if score + max_score_estimates.get(&(30 - time_remaining)).unwrap() <= *best_so_far {
+    if score
+        + 100
+        + max_score_estimates
+            .get(&(30 - (time_remaining / 2)))
+            .unwrap()
+        <= *best_so_far
+    {
         // Pointless avenue
         return;
     }
 
-    let cave = caves.get(current).unwrap();
-
     let mut moved = false;
 
-    for neighbour in cave.connected.iter() {
-        //path.push(format!("move to {neighbour}"));
-        if time_remaining < neighbour.1 {
-            // impossible move
-            continue;
-        }
-
-        if open.contains(&neighbour.0) {
-            // pointless move
-            continue;
-        }
-
-        cave_dfs(
-            caves,
-            &neighbour.0,
-            open.clone(),
-            score + (neighbour.1 - 1) * flow_rate,
-            flow_rate,
-            time_remaining - neighbour.1,
-            best_so_far,
-            max_score_estimates,
-            path,
-        );
-        moved = true;
-        //path.pop();
-    }
-
-    if !open.contains(current) {
+    if h_free_at >= time_remaining && !open.contains(h_current) && time_remaining > 1 {
         let mut new_open = open.clone();
-        new_open.insert(current.to_string());
+        new_open.insert(h_current.to_string());
+        let cave = caves.get(h_current).unwrap();
 
-        //path.push(format!("open {current}"));
+        //path.push(format!("{time_remaining} h open {h_current}"));
         cave_dfs(
             caves,
-            current,
+            h_current,
+            e_current,
             new_open,
             score,
             flow_rate + cave.flow_rate,
@@ -119,6 +96,31 @@ fn cave_dfs(
             best_so_far,
             max_score_estimates,
             path,
+            time_remaining - 2,
+            e_free_at,
+        );
+
+        moved = true;
+
+        //path.pop();
+    } else if e_free_at >= time_remaining && !open.contains(e_current) && time_remaining > 1 {
+        let mut new_open = open.clone();
+        new_open.insert(e_current.to_string());
+        let cave = caves.get(e_current).unwrap();
+        //path.push(format!("{time_remaining} e open {e_current}"));
+        cave_dfs(
+            caves,
+            h_current,
+            e_current,
+            new_open,
+            score,
+            flow_rate + cave.flow_rate,
+            time_remaining - 1,
+            best_so_far,
+            max_score_estimates,
+            path,
+            h_free_at,
+            time_remaining - 2,
         );
 
         moved = true;
@@ -126,11 +128,77 @@ fn cave_dfs(
         //path.pop();
     }
 
+    if h_free_at >= time_remaining {
+        let cave = caves.get(h_current).unwrap();
+        for neighbour in cave.connected.iter() {
+            if time_remaining < (neighbour.1 * 2) {
+                // impossible move
+                continue;
+            }
+
+            if open.contains(&neighbour.0) {
+                // pointless move
+                continue;
+            }
+            //path.push(format!("{time_remaining} h move to {neighbour:?}"));
+
+            cave_dfs(
+                caves,
+                &neighbour.0,
+                e_current,
+                open.clone(),
+                score,
+                flow_rate,
+                time_remaining - 1,
+                best_so_far,
+                max_score_estimates,
+                path,
+                time_remaining - (neighbour.1 * 2),
+                e_free_at,
+            );
+            moved = true;
+            //path.pop();
+        }
+    }
+    if e_free_at >= time_remaining {
+        let cave = caves.get(e_current).unwrap();
+        for neighbour in cave.connected.iter() {
+            if time_remaining < (neighbour.1 * 2) {
+                // impossible move
+                continue;
+            }
+
+            if open.contains(&neighbour.0) {
+                // pointless move
+                continue;
+            }
+            //path.push(format!("{time_remaining} e move to {neighbour:?}"));
+
+            cave_dfs(
+                caves,
+                h_current,
+                &neighbour.0,
+                open.clone(),
+                score,
+                flow_rate,
+                time_remaining - 1,
+                best_so_far,
+                max_score_estimates,
+                path,
+                h_free_at,
+                time_remaining - (neighbour.1 * 2),
+            );
+            moved = true;
+            //path.pop();
+        }
+    }
+
     if !moved {
         // ran out of moves, let's jump to the end?
         cave_dfs(
             caves,
-            current,
+            h_current,
+            e_current,
             open,
             score,
             flow_rate,
@@ -138,6 +206,8 @@ fn cave_dfs(
             best_so_far,
             max_score_estimates,
             path,
+            h_free_at,
+            e_free_at,
         );
     }
 }
@@ -153,12 +223,12 @@ fn calc_max_scores(caves: &HashMap<String, Node>) -> HashMap<u32, u32> {
 
     let mut output = HashMap::new();
 
-    for t in 0..=30 {
+    for t in 0..=31 {
         let mut flow_rate = 0;
         let mut score = 0;
 
         let mut rates = flow_rates.iter().rev();
-        for step in t..=30 {
+        for _ in t..=30 {
             flow_rate += rates.next().unwrap_or(&0);
             score += flow_rate;
         }
@@ -196,7 +266,7 @@ fn calc_dist(
 fn simplify_caves(caves: HashMap<String, Node>) -> HashMap<String, Node> {
     let mut nodes_with_flow = caves
         .iter()
-        .filter(|(name, node)| node.flow_rate > 0)
+        .filter(|(_, node)| node.flow_rate > 0)
         .map(|(name, _)| name)
         .cloned()
         .collect::<Vec<String>>();
@@ -236,29 +306,65 @@ pub fn part_one(input: &str) -> Option<u32> {
 
     println!("{caves:?}");
 
-    let caves = simplify_caves(caves);
+    let mut caves = simplify_caves(caves);
+
+    caves.insert(
+        String::from("Nope"),
+        Node {
+            flow_rate: 0,
+            connected: Vec::new(),
+        },
+    );
 
     println!("{caves:?}");
 
-    let mut best_so_far = 1650;
+    let mut best_so_far = 0;
 
     cave_dfs(
         &caves,
         "AA",
+        "Nope",
         HashSet::new(),
         0,
         0,
-        30,
+        60,
         &mut best_so_far,
         &calc_max_scores(&caves),
         &mut Vec::new(),
+        60,
+        60,
     );
 
     Some(best_so_far)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let caves = parse(input);
+
+    println!("{caves:?}");
+
+    let caves = simplify_caves(caves);
+
+    println!("{caves:?}");
+
+    let mut best_so_far = 1700;
+
+    cave_dfs(
+        &caves,
+        "AA",
+        "AA",
+        HashSet::new(),
+        0,
+        0,
+        26 * 2,
+        &mut best_so_far,
+        &calc_max_scores(&caves),
+        &mut Vec::new(),
+        26 * 2,
+        26 * 2,
+    );
+
+    Some(best_so_far)
 }
 
 fn main() {
@@ -280,6 +386,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 16);
-        assert_eq!(part_two(&input), None);
+        assert_eq!(part_two(&input), Some(1707));
     }
 }
