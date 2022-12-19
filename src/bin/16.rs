@@ -67,7 +67,7 @@ fn cave_dfs(
     };
 
     if score
-        + 100
+        + 200
         + max_score_estimates
             .get(&(30 - (time_remaining / 2)))
             .unwrap()
@@ -370,6 +370,8 @@ pub fn part_two(input: &str) -> Option<u32> {
 fn main() {
     let input = &advent_of_code::read_file("inputs", 16);
     advent_of_code::solve!(1, part_one, input);
+
+    // 2679 < x < 3100
     advent_of_code::solve!(2, part_two, input);
 }
 
